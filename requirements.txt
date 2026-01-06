@@ -2,6 +2,7 @@ pandas
 requests
 gspread
 oauth2client
-pykrx==1.0.0  # pykrx 라이브러리 버전 명시
+pykrx
 openpyxl
 lxml
+deprecated  # <--- 이 줄을 추가합니다.
