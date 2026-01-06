@@ -8,6 +8,7 @@ import time
 import os
 import json
 import warnings
+import traceback  # traceback 임포트
 
 # 경고 메시지 무시
 warnings.filterwarnings("ignore")
@@ -179,7 +180,8 @@ def main():
             time.sleep(0.1)
             
         except Exception as e:
-            print(f"Error processing {code}: {e}") # 에러 로그 출력
+            print(f"Error processing {code}: {e}")  # 에러 로그 출력
+            print(f"Error details for {code}: {traceback.format_exc()}")  # 에러 상세 내용 출력
             row = {
                 '종목코드': f"A{code}",
                 '종목명': "ERROR",
