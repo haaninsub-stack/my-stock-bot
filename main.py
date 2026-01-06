@@ -127,8 +127,8 @@ def get_naver_financials(code, current_price):
 def main():
     print("데이터 수집 시작...")
     # 오늘 날짜 또는 어제 날짜 사용 (주말/공휴일 대비)
-    today = datetime.now().strftime("%Y%m%d")
-    # today = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d")  # 어제 날짜 사용
+    # today = datetime.now().strftime("%Y%m%d")
+    today = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d")  # 어제 날짜 사용
     
     # 코스피, 코스닥 종목 코드 다 가져오기 (시간 문제로 10개만 테스트)
     # kospi = stock.get_market_ticker_list(today, market="KOSPI")
@@ -147,6 +147,7 @@ def main():
         try:
             # 기본 정보
             name = stock.get_market_ticker_name(code)
+            print(f"Processing {code}: {name}")  # 종목명 출력
             df_p = stock.get_market_ohlcv(today, today, code)
             
             if df_p.empty:
