@@ -3,7 +3,7 @@ import requests
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from pykrx import stock
-from datetime import datetime
+from datetime import datetime, timedelta  # timedelta 추가
 import time
 import os
 import json
@@ -126,15 +126,15 @@ def get_naver_financials(code, current_price):
 # ---------------------------------------------------------
 def main():
     print("데이터 수집 시작...")
+    # 오늘 날짜 또는 어제 날짜 사용 (주말/공휴일 대비)
     today = datetime.now().strftime("%Y%m%d")
+    # today = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d")  # 어제 날짜 사용
     
-    # 코스피, 코스닥 종목 코드 다 가져오기
-    # (시간상 코스피 200개만 먼저 테스트하려면 아래 줄 주석 풀고 사용하세요)
-    # tickers = stock.get_market_ticker_list(today, market="KOSPI")[:10] 
-    
-    kospi = stock.get_market_ticker_list(today, market="KOSPI")
-    kosdaq = stock.get_market_ticker_list(today, market="KOSDAQ")
-    tickers = kospi + kosdaq
+    # 코스피, 코스닥 종목 코드 다 가져오기 (시간 문제로 10개만 테스트)
+    # kospi = stock.get_market_ticker_list(today, market="KOSPI")
+    # kosdaq = stock.get_market_ticker_list(today, market="KOSDAQ")
+    # tickers = kospi + kosdaq
+    tickers = stock.get_market_ticker_list(today, market="KOSPI")[:10] # KOSPI 10개 종목만 테스트
     
     print(f"총 {len(tickers)}개 종목 수집 시작")
     
@@ -178,6 +178,7 @@ def main():
             time.sleep(0.1)
             
         except Exception as e:
+            print(f"Error processing {code}: {e}") # 에러 로그 출력
             continue
             
     # 구글 시트에 저장
@@ -186,9 +187,12 @@ def main():
     df.fillna(0, inplace=True) # 빈 값은 0으로 채움
     
     sheet = connect_google_sheet()
-    sheet.clear() # 기존 내용 지우기
-    sheet.update([df.columns.values.tolist()] + df.values.tolist())
-    print("완료!")
+    if sheet:
+        sheet.clear() # 기존 내용 지우기
+        sheet.update([df.columns.values.tolist()] + df.values.tolist())
+        print("완료!")
+    else:
+        print("구글 시트 연결 실패")
 
 if __name__ == "__main__":
     main()
